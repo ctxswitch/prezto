@@ -10,6 +10,7 @@ function prompt_ctxswitch_build_prompt {
     print -n ' %F{8}|%f${(e)python_info[virtualenv]}'
   fi
 }
+
 function prompt_ctxswitch_precmd {
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
@@ -58,7 +59,7 @@ function prompt_ctxswitch_setup {
   # Define prompts.
   PROMPT='
 ${(e)$(prompt_ctxswitch_build_prompt)}
-${editor_info[keymap]} '
+${editor_info[keymap]}» '
 }
 
 prompt_ctxswitch_setup "$@"
