@@ -1,0 +1,65 @@
+pmodload 'helper'
+
+function prompt_ctxswitch_build_prompt {
+  print -n '%F{blue}%n%F{red}@%F{green}%m%f %~'
+  if [[ -n "$git_info" ]]; then
+    print -n ' %F{8}|%f${(e)git_info[status]}'
+  fi
+
+  if [[ -n "$python_info" ]]; then
+    print -n ' %F{8}|%f${(e)python_info[virtualenv]}'
+  fi
+}
+function prompt_ctxswitch_precmd {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  if (( $+functions[git-info] )); then
+    git-info
+  fi
+
+  # Get Python environment information.
+  if (( $+functions[python-info] )); then
+    python-info
+  fi
+}
+
+function prompt_ctxswitch_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent sp subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+
+  # Add a hook for calling info functions before each command.
+  add-zsh-hook precmd prompt_ctxswitch_precmd
+
+    # Set editor-info parameters.
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{red}...%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format '%B%F{blue}❯%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{red}♺%f'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{red}❮%f%b'
+
+  # Set git-info parameters.
+  zstyle ':prezto:module:git:info' verbose 'no'
+  zstyle ':prezto:module:git:info:action' format ' +%s'
+  zstyle ':prezto:module:git:info:branch' format ' %F{8}%b%f'
+  zstyle ':prezto:module:git:info:commit' format ' %F{white}%.7c%f'
+  zstyle ':prezto:module:git:info:indexed' format ' '
+  zstyle ':prezto:module:git:info:unindexed' format ' '
+  zstyle ':prezto:module:git:info:untracked' format ' '
+  zstyle ':prezto:module:git:info:dirty' format ' %F{8}⚙%f'
+  zstyle ':prezto:module:git:info:keys' format 'status' '%b%c%s%D'
+
+  # %v - virtualenv name.
+  zstyle ':prezto:module:python:info:virtualenv' format 'virtualenv:%v'
+
+  # Define prompts.
+  PROMPT='
+${(e)$(prompt_ctxswitch_build_prompt)}
+${editor_info[keymap]} '
+}
+
+prompt_ctxswitch_setup "$@"
+
