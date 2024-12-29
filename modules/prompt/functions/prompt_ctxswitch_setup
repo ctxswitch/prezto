@@ -59,7 +59,7 @@ function prompt_ctxswitch_setup {
   # Define prompts.
   PROMPT='
 ${(e)$(prompt_ctxswitch_build_prompt)}
-${editor_info[keymap]}» '
+${editor_info[keymap]}%(?.%F{blue}${1:-» }%f.%F{red}${1:-» }%f)'
 }
 
 prompt_ctxswitch_setup "$@"
